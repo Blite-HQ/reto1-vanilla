@@ -1,0 +1,253 @@
+{
+  "classical": {
+    "exact": {
+      "assignment": [
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0
+      ],
+      "method": "bruteforce",
+      "value": 1150
+    },
+    "greedy": {
+      "assignment": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0
+      ],
+      "best": 1150,
+      "ratio": 1.0,
+      "reference": "locally-optimal single-flip greedy \u2014 ratio ~0.5 guarantee",
+      "value": 1150
+    },
+    "gw": {
+      "best": 1150,
+      "best_assignment": [
+        0,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1,
+        0
+      ],
+      "ratio_best": 1.0,
+      "reference": "Goemans & Williamson (1995), JACM 42(6) \u2014 ratio >= 0.878",
+      "sdp_bound": 1241.9997704843333,
+      "stats": {
+        "max": 1150.0,
+        "mean": 1150.0,
+        "min": 1150.0,
+        "n": 2,
+        "std": 0.0
+      }
+    },
+    "instance": "cr8-voltaje",
+    "optimum": 1150,
+    "sa": {
+      "best": 1150,
+      "best_assignment": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0
+      ],
+      "ratio_best": 1.0,
+      "stats": {
+        "max": 1150.0,
+        "mean": 1150.0,
+        "min": 1150.0,
+        "n": 2,
+        "std": 0.0
+      }
+    }
+  },
+  "config": {
+    "p_values": [
+      1,
+      2
+    ],
+    "seeds": [
+      0,
+      1
+    ],
+    "shots": 1024
+  },
+  "digest": "2aed569178ba6244f9a9747b23c3ba46f2d957e1bdd89e68daefc5596586a24f",
+  "environment": {
+    "packages": {
+      "cvxpy": "1.9.2",
+      "networkx": "3.6.1",
+      "numpy": "2.5.1",
+      "qiskit": "2.5.1",
+      "qiskit-aer": "0.17.2",
+      "scipy": "1.18.0"
+    },
+    "python": "3.12.3",
+    "timestamp_utc": "2026-07-23T20:29:47+00:00"
+  },
+  "instance": "cr8-voltaje",
+  "qaoa_local": {
+    "1": {
+      "best_sampled_cut": 1150,
+      "ratio_best": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 2,
+        "std": 0.0
+      },
+      "ratio_expected": {
+        "max": 0.8588275815539032,
+        "mean": 0.8588275803291212,
+        "min": 0.8588275791043393,
+        "n": 2,
+        "std": 1.7321032340792897e-09
+      },
+      "runs": [
+        {
+          "best_assignment": [
+            0,
+            1,
+            0,
+            0,
+            1,
+            1,
+            0,
+            0
+          ],
+          "best_sampled_cut": 1150,
+          "betas": [
+            -0.3302753352577049
+          ],
+          "expected_cut": 987.6517187869886,
+          "gammas": [
+            0.36124741257630283
+          ],
+          "p": 1,
+          "ratio_best": 1.0,
+          "ratio_expected": 0.8588275815539032,
+          "sampled_mean_cut": 976.826171875,
+          "seed": 0,
+          "shots": 1024
+        },
+        {
+          "best_assignment": [
+            0,
+            1,
+            0,
+            0,
+            1,
+            1,
+            0,
+            0
+          ],
+          "best_sampled_cut": 1150,
+          "betas": [
+            1.2405216437250788
+          ],
+          "expected_cut": 987.6517159699902,
+          "gammas": [
+            0.36131115433047134
+          ],
+          "p": 1,
+          "ratio_best": 1.0,
+          "ratio_expected": 0.8588275791043393,
+          "sampled_mean_cut": 991.60546875,
+          "seed": 1,
+          "shots": 1024
+        }
+      ]
+    },
+    "2": {
+      "best_sampled_cut": 1150,
+      "ratio_best": {
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "n": 2,
+        "std": 0.0
+      },
+      "ratio_expected": {
+        "max": 0.9035642649771454,
+        "mean": 0.9035512887332774,
+        "min": 0.9035383124894094,
+        "n": 2,
+        "std": 1.8351180066756954e-05
+      },
+      "runs": [
+        {
+          "best_assignment": [
+            0,
+            1,
+            0,
+            0,
+            1,
+            1,
+            0,
+            0
+          ],
+          "best_sampled_cut": 1150,
+          "betas": [
+            1.1388716918700745,
+            1.3847489956181918
+          ],
+          "expected_cut": 1039.0989047237172,
+          "gammas": [
+            0.31169403493727593,
+            0.667407744636632
+          ],
+          "p": 2,
+          "ratio_best": 1.0,
+          "ratio_expected": 0.9035642649771454,
+          "sampled_mean_cut": 1033.517578125,
+          "seed": 0,
+          "shots": 1024
+        },
+        {
+          "best_assignment": [
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            1,
+            0
+          ],
+          "best_sampled_cut": 1150,
+          "betas": [
+            -0.43078790226856717,
+            1.3865271157585994
+          ],
+          "expected_cut": 1039.0690593628208,
+          "gammas": [
+            0.3161811993061383,
+            0.6774391295391133
+          ],
+          "p": 2,
+          "ratio_best": 1.0,
+          "ratio_expected": 0.9035383124894094,
+          "sampled_mean_cut": 1034.056640625,
+          "seed": 1,
+          "shots": 1024
+        }
+      ]
+    }
+  }
+}
