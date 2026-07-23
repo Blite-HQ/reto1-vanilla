@@ -30,8 +30,8 @@ from pytket.extensions.qiskit import qiskit_to_tk
 ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
+from reto1.emulator import counts_stats  # noqa: E402
 from reto1.instances import canonical_digest, load_instance  # noqa: E402
-from reto1.maxcut import cut_value  # noqa: E402
 from reto1.qaoa import build_qaoa_circuit  # noqa: E402
 
 PROJECT = "quantathon-reto1"
@@ -61,31 +61,6 @@ def tk_circuit(instance_name: str, p: int, seed: int):
     tkc = qiskit_to_tk(circuit)
     tkc.name = f"{instance_name}-p{p}-s{seed}"
     return inst, tkc, gammas, betas
-
-
-def decode_pytket(key: tuple[int, ...], n_nodes: int) -> tuple[int, ...]:
-    """pytket readout tuple (index = qubit index) -> assignment, canonical x0=0."""
-    x = tuple(int(b) for b in key[:n_nodes])
-    return tuple(1 - v for v in x) if x[0] == 1 else x
-
-
-def counts_stats(counts: dict, inst) -> dict:
-    total_shots, weighted, best_cut, best_x = 0, 0.0, -1, None
-    for key, count in counts.items():
-        x = decode_pytket(tuple(key), inst.n_nodes)
-        value = cut_value(inst.edges, x)
-        total_shots += count
-        weighted += value * count
-        if value > best_cut:
-            best_cut, best_x = value, x
-    return {
-        "shots": total_shots,
-        "mean_cut": weighted / total_shots,
-        "best_cut": best_cut,
-        "best_assignment": list(best_x or ()),
-        "ratio_mean": (weighted / total_shots) / inst.optimum,
-        "ratio_best": best_cut / inst.optimum,
-    }
 
 
 def main() -> None:
@@ -119,10 +94,24 @@ def main() -> None:
                 inst, tkc, gammas, betas = tk_circuit(name, p, seed)
                 tag = f"{name}-p{p}-s{seed}"
                 ref = qnx.circuits.upload(circuit=tkc, name=tag, project=project)
-                # The cost endpoint only exists for billable devices; free
-                # emulators/syntax checkers cost 0 HQC by definition.
-                cost = (0.0 if args.device in FREE_DEVICES
-                        else qnx.circuits.cost(ref, args.shots, config))
+                # Free devices cost 0 by definition. The SDK cost endpoint
+                # derives a "<device>SC" syntax-checker name that only exists
+                # for H-series short names, so for other aliases (H2-Emulator)
+                # we fall back to the published HQC formula on the raw circuit
+                # (pre-compilation, so a lower bound; labeled as such).
+                if args.device in FREE_DEVICES:
+                    cost = 0.0
+                else:
+                    try:
+                        cost = float(qnx.circuits.cost(ref, args.shots, config) or 0.0)
+                    except Exception:
+                        counts_1q = sum(1 for c in tkc.get_commands()
+                                        if c.op.n_qubits == 1 and c.op.type.name != "Measure")
+                        counts_2q = sum(1 for c in tkc.get_commands() if c.op.n_qubits == 2)
+                        cost = 5 + args.shots * (counts_1q + 10 * counts_2q
+                                                 + 5 * inst.n_nodes) / 5000
+                        print(f"    (estimación local pre-compilación: "
+                              f"{counts_1q} 1q + {counts_2q} 2q)")
                 total_cost += float(cost or 0.0)
                 print(f"[{tag}] n={inst.n_nodes} device={args.device} "
                       f"shots={args.shots} costo_estimado={cost}")

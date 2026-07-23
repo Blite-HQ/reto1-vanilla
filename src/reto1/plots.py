@@ -112,6 +112,45 @@ def figure_ratio_vs_p_multi(sweeps: dict[str, dict], out_base: Path) -> None:
     plt.close(fig)
 
 
+def figure_noise_comparison(records: list[dict], local_sweeps: dict[str, dict],
+                            out_base: Path) -> None:
+    """Noise analysis: r on the noisy H2 emulator vs the noiseless references.
+
+    One point per (instance, p): noisy emulator sampled mean vs free noiseless
+    emulator vs local exact expectation. Grouped dot plot, one axis.
+    """
+    ideal = {(r["instance"], r["p"]): r["stats"]["ratio_mean"]
+             for r in records if r["device"] in ("H2-1LE", "H1-1LE")}
+    noisy = {(r["instance"], r["p"]): r["stats"]["ratio_mean"]
+             for r in records if r["device"] not in ("H2-1LE", "H1-1LE")}
+    keys = sorted(set(ideal) | set(noisy))
+    if not keys:
+        return
+    labels = [f"{name} p={p}" for name, p in keys]
+    x = range(len(keys))
+
+    fig, ax = plt.subplots(figsize=(7.5, 4.5))
+    exact = [local_sweeps.get(name, {}).get(p, {})
+             .get("ratio_expected", {}).get("mean") for name, p in keys]
+    ax.scatter(x, exact, marker="_", s=520, color=COLOR_INK, linewidths=2,
+               label="statevector local (exacto, sin ruido)")
+    ax.scatter(x, [ideal.get(k) for k in keys], s=70, color=COLOR_QAOA,
+               label="emulador H2-1LE (sin ruido, muestreado)")
+    ax.scatter(x, [noisy.get(k) for k in keys], s=70, color=COLOR_GW,
+               label="emulador H2 (modelo de ruido H-series)")
+    ax.set_xticks(list(x), labels, fontsize=7.5, rotation=30, ha="right")
+    ax.set_ylabel("razón de aproximación r (media de shots)")
+    ax.set_ylim(0.0, 1.08)
+    ax.set_title("Análisis de ruido: emulador H2 con ruido vs referencias ideales",
+                 fontsize=11, color=COLOR_INK)
+    ax.legend(loc="lower right", frameon=False, fontsize=8.5)
+    _style(ax)
+    fig.tight_layout()
+    fig.savefig(out_base.with_suffix(".pdf"))
+    fig.savefig(out_base.with_suffix(".png"), dpi=200)
+    plt.close(fig)
+
+
 def figure_partition(instance_path: Path, assignment: list[int],
                      out_base: Path) -> None:
     """Grid graph colored by fault zone; cut corridors dashed."""
