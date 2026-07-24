@@ -1,0 +1,160 @@
+{
+  "classical": {
+    "exact": {
+      "assignment": [
+        0,
+        1,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        1,
+        1
+      ],
+      "method": "bruteforce",
+      "value": 26
+    },
+    "greedy": {
+      "assignment": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "best": 24,
+      "ratio": 0.9230769230769231,
+      "reference": "locally-optimal single-flip greedy \u2014 ratio ~0.5 guarantee",
+      "value": 24
+    },
+    "gw": {
+      "best": 26,
+      "best_assignment": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        1,
+        1
+      ],
+      "ratio_best": 1.0,
+      "reference": "Goemans & Williamson (1995), JACM 42(6) \u2014 ratio >= 0.878",
+      "sdp_bound": 26.788729092384543,
+      "stats": {
+        "max": 26.0,
+        "mean": 26.0,
+        "min": 26.0,
+        "n": 5,
+        "std": 0.0
+      }
+    },
+    "instance": "cr20-uniforme",
+    "optimum": 26,
+    "sa": {
+      "best": 26,
+      "best_assignment": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        1,
+        1,
+        0,
+        1,
+        1
+      ],
+      "ratio_best": 1.0,
+      "stats": {
+        "max": 26.0,
+        "mean": 26.0,
+        "min": 26.0,
+        "n": 5,
+        "std": 0.0
+      }
+    }
+  },
+  "classical_open": null,
+  "config": {
+    "p_values": [
+      1,
+      2,
+      3
+    ],
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "shots": 4096
+  },
+  "digest": "f57c2fab3f719f17b54591ae0f55d73e2fa5a4f26a9ab8462ddae5cded4e4ed0",
+  "environment": {
+    "commit": "a56e2d1",
+    "packages": {
+      "cvxpy": "1.9.2",
+      "networkx": "3.6.1",
+      "numpy": "2.5.1",
+      "qiskit": "2.5.1",
+      "qiskit-aer": "0.17.2",
+      "scipy": "1.18.0"
+    },
+    "python": "3.12.3",
+    "timestamp_utc": "2026-07-24T16:20:31+00:00"
+  },
+  "instance": "cr20-uniforme",
+  "qaoa_local": null
+}

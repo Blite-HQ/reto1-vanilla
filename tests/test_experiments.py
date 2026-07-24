@@ -5,9 +5,10 @@ from pathlib import Path
 from reto1.experiments import (
     aggregate,
     run_classical_benchmarks,
+    run_open_benchmarks,
     run_qaoa_sweep,
 )
-from reto1.instances import load_instance
+from reto1.instances import load_instance, load_open_instance
 
 DATA_DIR = Path(__file__).parent.parent / "data"
 
@@ -30,6 +31,23 @@ def test_classical_benchmarks_cr6() -> None:
     assert report["sa"]["stats"]["n"] == 3
     for solver in ("gw", "greedy", "sa"):
         assert report[solver]["best"] <= inst.optimum
+
+
+def test_open_benchmarks_report_honest_interval() -> None:
+    inst = load_open_instance(DATA_DIR / "nacional" / "cr26-uniforme.json")
+    report = run_open_benchmarks(inst, seeds=(0, 1))
+    low, high = report["optimum_interval"]
+    assert low == report["best_found"] <= high == report["gw"]["sdp_bound"]
+    assert 0.0 < report["ratio_lower_bound"] <= 1.0
+    assert report["best_method"] in ("gw", "greedy", "sa")
+    assert report["best_found"] >= max(report["greedy"]["value"], report["sa"]["best"])
+    # No solver may exceed the rigorous SDP upper bound.
+    for value in (report["gw"]["best"], report["greedy"]["value"], report["sa"]["best"]):
+        assert value <= high + 1e-6
+    # The best assignment must actually achieve the claimed cut.
+    cut = sum(w for i, j, w in inst.edges
+              if report["best_assignment"][i] != report["best_assignment"][j])
+    assert cut == report["best_found"]
 
 
 def test_qaoa_sweep_shapes_and_threshold() -> None:

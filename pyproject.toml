@@ -23,6 +23,14 @@ dev = [
     "pytest-cov>=6.0",
     "ruff>=0.8",
 ]
+# Deliverables: Guppy parity port, executed notebook, Typst report.
+entregables = [
+    "guppylang>=0.21",
+    "nbformat>=5.10",
+    "nbclient>=0.10",
+    "ipykernel>=6.29",
+    "typst>=0.13",
+]
 
 [build-system]
 requires = ["hatchling"]

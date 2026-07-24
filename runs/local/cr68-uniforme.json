@@ -1,0 +1,141 @@
+{
+  "classical": null,
+  "classical_open": {
+    "best_assignment": [
+      0,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "best_found": 83,
+    "best_method": "sa",
+    "greedy": {
+      "value": 81
+    },
+    "gw": {
+      "best": 82,
+      "reference": "Goemans & Williamson (1995), JACM 42(6) \u2014 ratio >= 0.878",
+      "sdp_bound": 86.4324764637242,
+      "stats": {
+        "max": 82.0,
+        "mean": 82.0,
+        "min": 82.0,
+        "n": 5,
+        "std": 0.0
+      }
+    },
+    "instance": "cr68-uniforme",
+    "n_edges": 90,
+    "n_nodes": 68,
+    "optimum_interval": [
+      83,
+      86.4324764637242
+    ],
+    "ratio_lower_bound": 0.9602871906005747,
+    "sa": {
+      "best": 83,
+      "stats": {
+        "max": 83.0,
+        "mean": 81.2,
+        "min": 80.0,
+        "n": 5,
+        "std": 1.3038404810405297
+      }
+    }
+  },
+  "config": {
+    "p_values": [
+      1,
+      2,
+      3
+    ],
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "shots": 4096
+  },
+  "digest": "d984dd41a0681e69fd9a438b657ab52c205b088c1d1393514c994e6df1e372bb",
+  "environment": {
+    "commit": "a56e2d1",
+    "packages": {
+      "cvxpy": "1.9.2",
+      "networkx": "3.6.1",
+      "numpy": "2.5.1",
+      "qiskit": "2.5.1",
+      "qiskit-aer": "0.17.2",
+      "scipy": "1.18.0"
+    },
+    "python": "3.12.3",
+    "timestamp_utc": "2026-07-24T16:20:31+00:00"
+  },
+  "instance": "cr68-uniforme",
+  "qaoa_local": null
+}

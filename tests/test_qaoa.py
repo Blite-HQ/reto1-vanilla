@@ -2,9 +2,12 @@
 
 from pathlib import Path
 
+import numpy as np
+from qiskit.quantum_info import Statevector
+
 from reto1.instances import load_instance
 from reto1.maxcut import cut_value
-from reto1.qaoa import build_qaoa_circuit, run_qaoa
+from reto1.qaoa import _vector_probabilities, build_qaoa_circuit, run_qaoa
 
 DATA_DIR = Path(__file__).parent.parent / "data"
 
@@ -56,6 +59,29 @@ def test_deeper_p_does_not_degrade_ieee9() -> None:
     r1 = run_qaoa(inst.n_nodes, inst.edges, optimum=inst.optimum, p=1, seed=0)
     r2 = run_qaoa(inst.n_nodes, inst.edges, optimum=inst.optimum, p=2, seed=0)
     assert r2.ratio_expected >= r1.ratio_expected - 1e-6
+
+
+def test_vector_engine_matches_qiskit_on_triangle() -> None:
+    # The vectorized engine (cost layer as diagonal phases + per-axis RX mixer)
+    # must produce the exact same distribution as the generic Qiskit path.
+    gammas, betas = (0.37, -1.21), (0.85, 0.19)
+    circuit = build_qaoa_circuit(3, TRIANGLE, gammas, betas)
+    reference = Statevector.from_instruction(circuit).probabilities()
+    fast = _vector_probabilities(3, TRIANGLE, gammas, betas)
+    assert np.max(np.abs(fast - reference)) < 1e-12
+
+
+def test_vector_engine_matches_qiskit_on_weighted_instances() -> None:
+    rng = np.random.default_rng(7)
+    for name in ("cr8-voltaje", "ieee9-uniforme"):
+        inst = load_instance(DATA_DIR / f"{name}.json")
+        for p in (1, 2):
+            gammas = tuple(rng.uniform(0, np.pi, p))
+            betas = tuple(rng.uniform(0, np.pi / 2, p))
+            circuit = build_qaoa_circuit(inst.n_nodes, inst.edges, gammas, betas)
+            reference = Statevector.from_instruction(circuit).probabilities()
+            fast = _vector_probabilities(inst.n_nodes, inst.edges, gammas, betas)
+            assert np.max(np.abs(fast - reference)) < 1e-12, f"{name} p={p}"
 
 
 def test_best_assignment_cut_is_recomputed_classically() -> None:

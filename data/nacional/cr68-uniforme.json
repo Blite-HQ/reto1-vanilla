@@ -1,0 +1,537 @@
+{
+  "aristas": [
+    [
+      0,
+      1,
+      1
+    ],
+    [
+      0,
+      3,
+      1
+    ],
+    [
+      0,
+      4,
+      1
+    ],
+    [
+      0,
+      5,
+      1
+    ],
+    [
+      0,
+      6,
+      1
+    ],
+    [
+      0,
+      12,
+      2
+    ],
+    [
+      0,
+      13,
+      1
+    ],
+    [
+      0,
+      14,
+      1
+    ],
+    [
+      0,
+      21,
+      1
+    ],
+    [
+      0,
+      30,
+      1
+    ],
+    [
+      1,
+      2,
+      1
+    ],
+    [
+      1,
+      7,
+      1
+    ],
+    [
+      1,
+      40,
+      1
+    ],
+    [
+      3,
+      4,
+      1
+    ],
+    [
+      5,
+      6,
+      1
+    ],
+    [
+      5,
+      11,
+      2
+    ],
+    [
+      5,
+      67,
+      1
+    ],
+    [
+      7,
+      8,
+      1
+    ],
+    [
+      7,
+      10,
+      1
+    ],
+    [
+      8,
+      9,
+      1
+    ],
+    [
+      8,
+      16,
+      1
+    ],
+    [
+      9,
+      10,
+      1
+    ],
+    [
+      9,
+      11,
+      1
+    ],
+    [
+      9,
+      15,
+      1
+    ],
+    [
+      9,
+      16,
+      1
+    ],
+    [
+      10,
+      28,
+      1
+    ],
+    [
+      10,
+      29,
+      1
+    ],
+    [
+      10,
+      53,
+      1
+    ],
+    [
+      10,
+      59,
+      1
+    ],
+    [
+      11,
+      12,
+      2
+    ],
+    [
+      11,
+      15,
+      1
+    ],
+    [
+      11,
+      24,
+      1
+    ],
+    [
+      11,
+      26,
+      1
+    ],
+    [
+      11,
+      27,
+      1
+    ],
+    [
+      12,
+      13,
+      1
+    ],
+    [
+      12,
+      17,
+      1
+    ],
+    [
+      12,
+      36,
+      2
+    ],
+    [
+      13,
+      14,
+      1
+    ],
+    [
+      13,
+      18,
+      1
+    ],
+    [
+      13,
+      19,
+      1
+    ],
+    [
+      13,
+      44,
+      1
+    ],
+    [
+      13,
+      45,
+      1
+    ],
+    [
+      15,
+      33,
+      1
+    ],
+    [
+      17,
+      20,
+      1
+    ],
+    [
+      17,
+      23,
+      1
+    ],
+    [
+      17,
+      41,
+      1
+    ],
+    [
+      17,
+      51,
+      1
+    ],
+    [
+      18,
+      50,
+      1
+    ],
+    [
+      19,
+      20,
+      1
+    ],
+    [
+      19,
+      37,
+      1
+    ],
+    [
+      20,
+      21,
+      1
+    ],
+    [
+      20,
+      22,
+      1
+    ],
+    [
+      22,
+      23,
+      1
+    ],
+    [
+      22,
+      25,
+      1
+    ],
+    [
+      22,
+      31,
+      1
+    ],
+    [
+      22,
+      39,
+      1
+    ],
+    [
+      23,
+      56,
+      1
+    ],
+    [
+      24,
+      32,
+      1
+    ],
+    [
+      24,
+      65,
+      1
+    ],
+    [
+      25,
+      57,
+      1
+    ],
+    [
+      26,
+      27,
+      1
+    ],
+    [
+      27,
+      28,
+      1
+    ],
+    [
+      27,
+      35,
+      1
+    ],
+    [
+      28,
+      49,
+      1
+    ],
+    [
+      29,
+      30,
+      1
+    ],
+    [
+      31,
+      34,
+      1
+    ],
+    [
+      32,
+      38,
+      1
+    ],
+    [
+      35,
+      36,
+      1
+    ],
+    [
+      36,
+      48,
+      1
+    ],
+    [
+      38,
+      61,
+      1
+    ],
+    [
+      39,
+      43,
+      1
+    ],
+    [
+      39,
+      46,
+      1
+    ],
+    [
+      41,
+      42,
+      1
+    ],
+    [
+      42,
+      43,
+      1
+    ],
+    [
+      44,
+      45,
+      1
+    ],
+    [
+      46,
+      47,
+      1
+    ],
+    [
+      48,
+      49,
+      1
+    ],
+    [
+      50,
+      51,
+      1
+    ],
+    [
+      50,
+      52,
+      1
+    ],
+    [
+      52,
+      66,
+      1
+    ],
+    [
+      53,
+      54,
+      1
+    ],
+    [
+      54,
+      55,
+      1
+    ],
+    [
+      57,
+      58,
+      1
+    ],
+    [
+      59,
+      60,
+      1
+    ],
+    [
+      60,
+      61,
+      1
+    ],
+    [
+      60,
+      63,
+      1
+    ],
+    [
+      61,
+      62,
+      1
+    ],
+    [
+      62,
+      63,
+      1
+    ],
+    [
+      62,
+      64,
+      1
+    ],
+    [
+      65,
+      66,
+      1
+    ]
+  ],
+  "convencion": "uniforme",
+  "criterio_corredor": "greedy densest desde la subestacion de mayor grado, desempate alfabetico (ver scripts/build_cr_instances.py)",
+  "definicion_peso": "1 por circuito paralelo",
+  "descargado": "2026-07-23",
+  "digest": "252d0726f9945c601aee4c41b57b71afd784ee553d386199f4bbe317c07c5c5e",
+  "escala": 1,
+  "fuente": {
+    "lineas": "https://services1.arcgis.com/cW2GfO4rBCLoFwgj/arcgis/rest/services/LineasDeTransmision/FeatureServer",
+    "portal": "https://datos-ice-se.opendata.arcgis.com",
+    "subestaciones": "https://services1.arcgis.com/cW2GfO4rBCLoFwgj/arcgis/rest/services/Subestaciones/FeatureServer"
+  },
+  "instancia": "cr68",
+  "n_nodos": 68,
+  "nodos": {
+    "0": "La Caja",
+    "1": "Alajuelita",
+    "10": "Rio Macho",
+    "11": "San Miguel",
+    "12": "Lindora",
+    "13": "La Garita",
+    "14": "El Coco",
+    "15": "Sabanilla",
+    "16": "Turrialba",
+    "17": "Arenal",
+    "18": "Balsa",
+    "19": "Barranca",
+    "2": "Anonos",
+    "20": "Garabito",
+    "21": "Coyol",
+    "22": "Ca\u00f1as",
+    "23": "Corobici",
+    "24": "Cariblanco",
+    "25": "Colorado",
+    "26": "Coronado",
+    "27": "El Este",
+    "28": "Tejar",
+    "29": "Desamparados",
+    "3": "Belen",
+    "30": "Escaz\u00fa",
+    "31": "Filadelfia",
+    "32": "General",
+    "33": "Guadalupe",
+    "34": "Guayabal",
+    "35": "Higuito",
+    "36": "Tarbaca",
+    "37": "Juanilama",
+    "38": "Leesville",
+    "39": "Liberia",
+    "4": "Ribera",
+    "40": "Los \u00c1ngeles",
+    "41": "Miravalles",
+    "42": "Mogote",
+    "43": "Pailas",
+    "44": "Naranjo",
+    "45": "Poas",
+    "46": "Papagayo",
+    "47": "Nuevo Colon",
+    "48": "Parrita",
+    "49": "Pirris",
+    "5": "Colima",
+    "50": "Pe\u00f1as Blancas",
+    "51": "Tejona",
+    "52": "Ciudad Quesada",
+    "53": "San Isidro",
+    "54": "Palmar",
+    "55": "Rio Claro",
+    "56": "Sandillal",
+    "57": "Santa Rita",
+    "58": "Cobano",
+    "59": "Torito",
+    "6": "Heredia",
+    "60": "Reventazon",
+    "61": "Trapiche",
+    "62": "Moin",
+    "63": "R\u00edo Blanco",
+    "64": "Cahuita",
+    "65": "Toro",
+    "66": "Venecia",
+    "67": "Uruca",
+    "7": "Concavas",
+    "8": "Angostura",
+    "9": "Cachi"
+  }
+}

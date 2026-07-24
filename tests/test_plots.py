@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 
 from reto1.plots import (
+    figure_national_map,
+    figure_national_scaling,
     figure_noise_comparison,
     figure_partition,
     figure_ratio_vs_p,
@@ -11,6 +13,7 @@ from reto1.plots import (
 )
 
 DATA_DIR = Path(__file__).parent.parent / "data"
+NACIONAL_DIR = DATA_DIR / "nacional"
 
 SWEEP = {
     1: {"ratio_expected": {"mean": 0.83, "std": 0.01, "n": 5},
@@ -60,3 +63,25 @@ def test_noise_comparison_skips_when_empty(tmp_path: Path) -> None:
     out = tmp_path / "vacio"
     figure_noise_comparison([], {}, out)
     assert not out.with_suffix(".pdf").exists()
+
+
+def test_national_map_renders(tmp_path: Path) -> None:
+    record = json.loads((NACIONAL_DIR / "cr68-uniforme.json").read_text())
+    assignment = [v % 2 for v in range(record["n_nodos"])]  # synthetic split
+    best = sum(w for i, j, w in record["aristas"] if assignment[i] != assignment[j])
+    report = {"optimum_interval": [best, best + 5.0], "best_method": "gw"}
+    cr8_names = set(json.loads((DATA_DIR / "cr8-uniforme.json").read_text())
+                    ["nodos"].values())
+    out = tmp_path / "mapa"
+    figure_national_map(NACIONAL_DIR / "cr68-uniforme.json", assignment, report,
+                        DATA_DIR / "raw" / "ice-subestaciones.geojson",
+                        cr8_names, out)
+    assert out.with_suffix(".pdf").exists() and out.with_suffix(".png").exists()
+
+
+def test_national_scaling_renders(tmp_path: Path) -> None:
+    quantum = [(6, 0.93, 0.01), (8, 0.93, 0.01), (12, 0.9, 0.02), (20, 0.88, 0.02)]
+    open_pts = [(26, 0.91), (44, 0.9), (68, 0.89)]
+    out = tmp_path / "escalado"
+    figure_national_scaling(quantum, open_pts, out)
+    assert out.with_suffix(".pdf").exists() and out.with_suffix(".png").exists()

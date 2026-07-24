@@ -1,0 +1,129 @@
+{
+  "classical": null,
+  "classical_open": {
+    "best_assignment": [
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      0,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      1,
+      0,
+      1,
+      0
+    ],
+    "best_found": 69,
+    "best_method": "gw",
+    "greedy": {
+      "value": 65
+    },
+    "gw": {
+      "best": 69,
+      "reference": "Goemans & Williamson (1995), JACM 42(6) \u2014 ratio >= 0.878",
+      "sdp_bound": 71.74896484013496,
+      "stats": {
+        "max": 69.0,
+        "mean": 68.8,
+        "min": 68.0,
+        "n": 5,
+        "std": 0.4472135954999579
+      }
+    },
+    "instance": "cr56-uniforme",
+    "n_edges": 75,
+    "n_nodes": 56,
+    "optimum_interval": [
+      69,
+      71.74896484013496
+    ],
+    "ratio_lower_bound": 0.9616863484196605,
+    "sa": {
+      "best": 68,
+      "stats": {
+        "max": 68.0,
+        "mean": 67.4,
+        "min": 67.0,
+        "n": 5,
+        "std": 0.5477225575051661
+      }
+    }
+  },
+  "config": {
+    "p_values": [
+      1,
+      2,
+      3
+    ],
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "shots": 4096
+  },
+  "digest": "b67aeb0de3a69e6d1207da696c1bee361de2a4f5f10bc1972d597092eee07177",
+  "environment": {
+    "commit": "a56e2d1",
+    "packages": {
+      "cvxpy": "1.9.2",
+      "networkx": "3.6.1",
+      "numpy": "2.5.1",
+      "qiskit": "2.5.1",
+      "qiskit-aer": "0.17.2",
+      "scipy": "1.18.0"
+    },
+    "python": "3.12.3",
+    "timestamp_utc": "2026-07-24T16:20:31+00:00"
+  },
+  "instance": "cr56-uniforme",
+  "qaoa_local": null
+}

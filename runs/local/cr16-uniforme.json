@@ -1,0 +1,144 @@
+{
+  "classical": {
+    "exact": {
+      "assignment": [
+        0,
+        1,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        1
+      ],
+      "method": "bruteforce",
+      "value": 22
+    },
+    "greedy": {
+      "assignment": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0
+      ],
+      "best": 20,
+      "ratio": 0.9090909090909091,
+      "reference": "locally-optimal single-flip greedy \u2014 ratio ~0.5 guarantee",
+      "value": 20
+    },
+    "gw": {
+      "best": 22,
+      "best_assignment": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        1,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        1
+      ],
+      "ratio_best": 1.0,
+      "reference": "Goemans & Williamson (1995), JACM 42(6) \u2014 ratio >= 0.878",
+      "sdp_bound": 22.539236333850667,
+      "stats": {
+        "max": 22.0,
+        "mean": 22.0,
+        "min": 22.0,
+        "n": 5,
+        "std": 0.0
+      }
+    },
+    "instance": "cr16-uniforme",
+    "optimum": 22,
+    "sa": {
+      "best": 22,
+      "best_assignment": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        1
+      ],
+      "ratio_best": 1.0,
+      "stats": {
+        "max": 22.0,
+        "mean": 22.0,
+        "min": 22.0,
+        "n": 5,
+        "std": 0.0
+      }
+    }
+  },
+  "classical_open": null,
+  "config": {
+    "p_values": [
+      1,
+      2,
+      3
+    ],
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "shots": 4096
+  },
+  "digest": "847bc67b1ce99a371e0f5586cb28310b2767f93b92ff3eebfd428544bb1ae86b",
+  "environment": {
+    "commit": "a56e2d1",
+    "packages": {
+      "cvxpy": "1.9.2",
+      "networkx": "3.6.1",
+      "numpy": "2.5.1",
+      "qiskit": "2.5.1",
+      "qiskit-aer": "0.17.2",
+      "scipy": "1.18.0"
+    },
+    "python": "3.12.3",
+    "timestamp_utc": "2026-07-24T16:20:31+00:00"
+  },
+  "instance": "cr16-uniforme",
+  "qaoa_local": null
+}

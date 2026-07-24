@@ -1,0 +1,117 @@
+{
+  "classical": null,
+  "classical_open": {
+    "best_assignment": [
+      0,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "best_found": 55,
+    "best_method": "gw",
+    "greedy": {
+      "value": 49
+    },
+    "gw": {
+      "best": 55,
+      "reference": "Goemans & Williamson (1995), JACM 42(6) \u2014 ratio >= 0.878",
+      "sdp_bound": 57.66676616572225,
+      "stats": {
+        "max": 55.0,
+        "mean": 55.0,
+        "min": 55.0,
+        "n": 5,
+        "std": 0.0
+      }
+    },
+    "instance": "cr44-uniforme",
+    "n_edges": 60,
+    "n_nodes": 44,
+    "optimum_interval": [
+      55,
+      57.66676616572225
+    ],
+    "ratio_lower_bound": 0.9537555798072928,
+    "sa": {
+      "best": 55,
+      "stats": {
+        "max": 55.0,
+        "mean": 54.6,
+        "min": 53.0,
+        "n": 5,
+        "std": 0.8944271909999159
+      }
+    }
+  },
+  "config": {
+    "p_values": [
+      1,
+      2,
+      3
+    ],
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "shots": 4096
+  },
+  "digest": "d6a5a0caa68d733ef39d6efb9fbdc015d6b5059ee3fb451b7efd5288480b2c78",
+  "environment": {
+    "commit": "a56e2d1",
+    "packages": {
+      "cvxpy": "1.9.2",
+      "networkx": "3.6.1",
+      "numpy": "2.5.1",
+      "qiskit": "2.5.1",
+      "qiskit-aer": "0.17.2",
+      "scipy": "1.18.0"
+    },
+    "python": "3.12.3",
+    "timestamp_utc": "2026-07-24T16:20:31+00:00"
+  },
+  "instance": "cr44-uniforme",
+  "qaoa_local": null
+}

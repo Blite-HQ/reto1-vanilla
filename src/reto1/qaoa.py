@@ -29,6 +29,19 @@ DEFAULT_SHOTS = 4096
 GRID_POINTS = 16
 RANDOM_RESTARTS = 6
 COBYLA_MAXITER = 250
+# Instances up to 14 nodes (every originally published run, ieee14 included)
+# keep the generic Qiskit statevector path so frozen artifacts reproduce
+# bit-for-bit. Larger corridors switch to the vectorized engine below, which
+# computes the SAME distribution (parity-tested to ~1e-12): the generic path
+# costs ~2.8 s/evaluation at 20 qubits — infeasible inside the optimizer.
+VECTOR_ENGINE_MIN_N = 15
+# Reduced, documented optimization budget for those larger corridors (an
+# evaluation still costs ~0.5 s at n=20). The warm-start chain p -> p+1 plus
+# QAOA angle concentration (Zhou et al. 2020, arXiv:1812.01041, INTERP) make
+# the dense multistart redundant there; small instances keep the full budget.
+GRID_POINTS_LARGE = 8
+RANDOM_RESTARTS_LARGE = 2
+COBYLA_MAXITER_LARGE = 100
 
 
 @dataclass(frozen=True)
@@ -80,11 +93,49 @@ def _cut_spectrum(n_nodes: int, edges: Sequence[Edge]) -> np.ndarray:
     return cuts
 
 
+def _vector_probabilities(
+    n_nodes: int,
+    edges: Sequence[Edge],
+    gammas: Sequence[float],
+    betas: Sequence[float],
+    norm_spectrum: np.ndarray | None = None,
+) -> np.ndarray:
+    """Probabilities of the QAOA state via dense vector simulation.
+
+    Same circuit convention as build_qaoa_circuit, exploiting that the cost
+    layer is diagonal — its phases are exp(2i*gamma*cut_norm(x)) up to a global
+    phase, with cut_norm the cut spectrum of the max|w|-normalized weights —
+    and that the mixer layer is a tensor product of RX(2*beta) rotations,
+    applied axis by axis. Bit i of the basis index is node i, identical to
+    _cut_spectrum and to Qiskit's little-endian probabilities(). Parity with
+    the Qiskit statevector path is asserted in tests.
+    """
+    if norm_spectrum is None:
+        norm_spectrum = _cut_spectrum(n_nodes, _normalized(edges))
+    dim = 1 << n_nodes
+    psi = np.full(dim, 1.0 / np.sqrt(dim), dtype=np.complex128)
+    for gamma, beta in zip(gammas, betas, strict=True):
+        psi *= np.exp(2j * gamma * norm_spectrum)
+        cos_b, sin_b = np.cos(beta), -1j * np.sin(beta)
+        for q in range(n_nodes):
+            psi = psi.reshape(-1, 2, 1 << q)
+            top = psi[:, 0, :].copy()
+            psi[:, 0, :] = cos_b * top + sin_b * psi[:, 1, :]
+            psi[:, 1, :] = sin_b * top + cos_b * psi[:, 1, :]
+        psi = psi.reshape(dim)
+    return np.abs(psi) ** 2
+
+
 def _expected_cut(params: np.ndarray, n_nodes: int, edges: Sequence[Edge],
-                  spectrum: np.ndarray) -> float:
+                  spectrum: np.ndarray,
+                  norm_spectrum: np.ndarray | None = None) -> float:
     p = len(params) // 2
-    circuit = build_qaoa_circuit(n_nodes, edges, params[:p], params[p:])
-    probabilities = Statevector.from_instruction(circuit).probabilities()
+    if norm_spectrum is not None:
+        probabilities = _vector_probabilities(n_nodes, edges, params[:p],
+                                              params[p:], norm_spectrum)
+    else:
+        circuit = build_qaoa_circuit(n_nodes, edges, params[:p], params[p:])
+        probabilities = Statevector.from_instruction(circuit).probabilities()
     return float(probabilities @ spectrum)
 
 
@@ -95,15 +146,26 @@ def _optimize_angles(
     seed: int,
     warm_start: np.ndarray | None,
 ) -> tuple[np.ndarray, float]:
-    """Maximize the exact expectation; returns (params, expected_cut)."""
+    """Maximize the exact expectation; returns (params, expected_cut).
+
+    Instances below VECTOR_ENGINE_MIN_N keep the original full budget (16x8
+    grid, 6 random restarts, 250 COBYLA iters) so the published runs reproduce
+    bit-for-bit; larger corridors use the reduced budget documented above.
+    """
     spectrum = _cut_spectrum(n_nodes, edges)
-    objective = lambda t: -_expected_cut(t, n_nodes, edges, spectrum)  # noqa: E731
+    large = n_nodes >= VECTOR_ENGINE_MIN_N
+    norm_spectrum = _cut_spectrum(n_nodes, _normalized(edges)) if large else None
+    grid_points = GRID_POINTS_LARGE if large else GRID_POINTS
+    restarts = RANDOM_RESTARTS_LARGE if large else RANDOM_RESTARTS
+    maxiter = COBYLA_MAXITER_LARGE if large else COBYLA_MAXITER
+    objective = lambda t: -_expected_cut(t, n_nodes, edges, spectrum,  # noqa: E731
+                                         norm_spectrum)
     rng = np.random.default_rng(seed)
 
     starts: list[np.ndarray] = []
     if p == 1:
-        grid_gamma = np.linspace(0.05, np.pi, GRID_POINTS)
-        grid_beta = np.linspace(0.05, np.pi / 2, GRID_POINTS // 2)
+        grid_gamma = np.linspace(0.05, np.pi, grid_points)
+        grid_beta = np.linspace(0.05, np.pi / 2, grid_points // 2)
         best_grid = max(
             (np.array([g, b]) for g in grid_gamma for b in grid_beta),
             key=lambda t: -objective(t),
@@ -113,14 +175,14 @@ def _optimize_angles(
         padded = np.concatenate([warm_start[: p - 1], [0.0],
                                  warm_start[p - 1:], [0.0]])
         starts.append(padded)
-    for _ in range(RANDOM_RESTARTS):
+    for _ in range(restarts):
         starts.append(np.concatenate([rng.uniform(0, np.pi, p),
                                       rng.uniform(0, np.pi / 2, p)]))
 
     best_params, best_value = None, -np.inf
     for start in starts:
         result = minimize(objective, start, method="COBYLA",
-                          options={"maxiter": COBYLA_MAXITER, "rhobeg": 0.3})
+                          options={"maxiter": maxiter, "rhobeg": 0.3})
         value = -result.fun
         if value > best_value:
             best_params, best_value = np.asarray(result.x), value

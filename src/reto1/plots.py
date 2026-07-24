@@ -151,6 +151,115 @@ def figure_noise_comparison(records: list[dict], local_sweeps: dict[str, dict],
     plt.close(fig)
 
 
+def _substation_coordinates(raw_path: Path) -> dict[str, tuple[float, float]]:
+    """Display name -> (lon, lat) from the raw ICE substations GeoJSON."""
+    features = json.loads(raw_path.read_text())["features"]
+    return {f["properties"]["Subestacio"]: tuple(f["geometry"]["coordinates"])
+            for f in features}
+
+
+def figure_national_map(instance_path: Path, assignment: list[int],
+                        open_report: dict, raw_substations: Path,
+                        highlight_names: set[str], out_base: Path) -> None:
+    """The national grid on real WGS84 coordinates, colored by fault zone.
+
+    Kept corridors solid, cut corridors dashed; the cr8 headline corridor is
+    ring-highlighted. The title reports the honest interval: best classical
+    cut found and the rigorous SDP upper bound.
+    """
+    record = json.loads(instance_path.read_text())
+    names = {int(k): v for k, v in record["nodos"].items()}
+    coords = _substation_coordinates(raw_substations)
+    pos = {v: coords[names[v]] for v in range(record["n_nodos"])}
+
+    graph = nx.Graph()
+    graph.add_nodes_from(range(record["n_nodos"]))
+    graph.add_weighted_edges_from((i, j, w) for i, j, w in record["aristas"])
+
+    fig, ax = plt.subplots(figsize=(9, 6.5))
+    kept = [(i, j) for i, j, _ in record["aristas"] if assignment[i] == assignment[j]]
+    cut = [(i, j) for i, j, _ in record["aristas"] if assignment[i] != assignment[j]]
+    nx.draw_networkx_edges(graph, pos, edgelist=kept, width=1.2,
+                           edge_color=COLOR_NEUTRAL, ax=ax)
+    nx.draw_networkx_edges(graph, pos, edgelist=cut, width=1.6, style="dashed",
+                           edge_color=COLOR_GW, ax=ax)
+    node_colors = [SIDE_FILLS[assignment[v]] for v in graph.nodes]
+    rings = [2.0 if names[v] in highlight_names else 0.7 for v in graph.nodes]
+    nx.draw_networkx_nodes(graph, pos, node_color=node_colors, node_size=110,
+                           edgecolors=COLOR_INK, linewidths=rings, ax=ax)
+    for v in graph.nodes:
+        if names[v] in highlight_names:
+            x, y = pos[v]
+            ax.annotate(names[v], (x, y), textcoords="offset points",
+                        xytext=(4, 4), fontsize=6.5, color=COLOR_INK)
+
+    low, high = open_report["optimum_interval"]
+    ax.set_title(f"Red de transmisión de Costa Rica ({record['n_nodos']} subestaciones, "
+                 f"datos ICE): partición en zonas de falla\n"
+                 f"mejor corte clásico = {low} ({open_report['best_method'].upper()}), "
+                 f"cota superior SDP = {high:.1f} — corredor cr8 resaltado",
+                 fontsize=10.5, color=COLOR_INK)
+    ax.set_xlabel("longitud")
+    ax.set_ylabel("latitud")
+    ax.set_aspect("equal")
+    _style(ax)
+    fig.tight_layout()
+    fig.savefig(out_base.with_suffix(".pdf"))
+    fig.savefig(out_base.with_suffix(".png"), dpi=200)
+    plt.close(fig)
+
+
+def figure_national_scaling(quantum_points: list[tuple[int, float, float]],
+                            open_points: list[tuple[int, float]],
+                            out_base: Path) -> None:
+    """Approximation quality vs instance size across the national ladder.
+
+    Quantum points: QAOA mean r ± σ (deepest p) on corridors with a proven
+    optimum. Open points: LOWER bounds (best classical / SDP bound) — the true
+    r of the best classical cut is at least this. Vertical walls mark the
+    documented limits: local statevector optimization (20 qubits) and the H2
+    emulator ceiling (26 qubits); beyond them the honest answer is classical.
+    """
+    fig, ax = plt.subplots(figsize=(7.5, 4.5))
+    q_n = [n for n, _, _ in quantum_points]
+    q_mean = [m for _, m, _ in quantum_points]
+    q_std = [s for _, _, s in quantum_points]
+    ax.errorbar(q_n, q_mean, yerr=q_std, color=COLOR_QAOA, linewidth=2,
+                marker="o", markersize=7, capsize=4,
+                label="QAOA ⟨cut⟩/óptimo (óptimo probado)")
+    o_n = [n for n, _ in open_points]
+    o_r = [r for _, r in open_points]
+    ax.plot(o_n, o_r, color=COLOR_GW, linewidth=0, marker="^", markersize=8,
+            label="cota inferior: mejor clásico / cota SDP")
+    ax.axhline(GW_GUARANTEE, color=COLOR_NEUTRAL, linewidth=0.9, linestyle="--")
+    ax.text(0.02, GW_GUARANTEE + 0.012, "garantía GW 0.878", color=COLOR_NEUTRAL,
+            transform=ax.get_yaxis_transform(), fontsize=8)
+
+    top = max(o_n) + 3
+    ax.axvline(20, color=COLOR_NEUTRAL, linewidth=0.9, linestyle=":")
+    ax.axvline(26, color=COLOR_NEUTRAL, linewidth=0.9, linestyle=":")
+    ax.axvspan(26, top, color="#f2f2f2", zorder=0)
+    for x, text in ((20, "límite optimización local (20 qubits)"),
+                    (26, "techo emulador H2 (26 qubits)")):
+        ax.text(x, 0.06, text, rotation=90, fontsize=7.5, color=COLOR_NEUTRAL,
+                ha="right", va="bottom")
+    ax.text((26 + top) / 2, 0.06, "solo clásico +\nextrapolación honesta",
+            fontsize=8, color=COLOR_NEUTRAL, ha="center", va="bottom")
+
+    ax.set_xlabel("tamaño de instancia n (subestaciones)")
+    ax.set_ylabel("razón de aproximación r")
+    ax.set_xlim(4, top)
+    ax.set_ylim(0.0, 1.08)
+    ax.set_title("Escalado en la red nacional ICE: corredores anidados cr6 → cr68",
+                 fontsize=11, color=COLOR_INK)
+    ax.legend(loc="lower right", frameon=False, fontsize=8.5)
+    _style(ax)
+    fig.tight_layout()
+    fig.savefig(out_base.with_suffix(".pdf"))
+    fig.savefig(out_base.with_suffix(".png"), dpi=200)
+    plt.close(fig)
+
+
 def figure_partition(instance_path: Path, assignment: list[int],
                      out_base: Path) -> None:
     """Grid graph colored by fault zone; cut corridors dashed."""

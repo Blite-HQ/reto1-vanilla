@@ -40,8 +40,27 @@ def canonical_digest(record: dict) -> str:
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
-def load_instance(path: Path) -> Instance:
-    """Load an instance JSON, verifying its embedded digest."""
+@dataclass(frozen=True)
+class OpenInstance:
+    """A weighted Max-Cut instance with NO proven optimum (national ladder).
+
+    The file carries only the graph and its provenance, never solution
+    claims; benchmarks report the honest interval [best found, SDP bound].
+    """
+
+    name: str
+    convention: str
+    n_nodes: int
+    edges: tuple[Edge, ...]
+    digest: str
+
+    @property
+    def total_weight(self) -> int:
+        return sum(w for _, _, w in self.edges)
+
+
+def _verified_record(path: Path) -> dict:
+    """Read an instance JSON and check its embedded canonical digest."""
     record = json.loads(path.read_text(encoding="utf-8"))
     embedded = record.get("digest")
     if not embedded:
@@ -52,6 +71,12 @@ def load_instance(path: Path) -> Instance:
             f"{path.name}: digest mismatch (embedded {embedded[:12]}…, "
             f"computed {computed[:12]}…) — file was modified after freezing"
         )
+    return record
+
+
+def load_instance(path: Path) -> Instance:
+    """Load an instance JSON, verifying its embedded digest."""
+    record = _verified_record(path)
     return Instance(
         name=f"{record['instancia']}-{record['convencion']}",
         convention=record["convencion"],
@@ -61,7 +86,21 @@ def load_instance(path: Path) -> Instance:
         optimum=int(record["optimo"]),
         canonical_assignment=tuple(int(x) for x in record["asignacion_canonica"]),
         methods=tuple(record["metodos"]),
-        digest=embedded,
+        digest=record["digest"],
+    )
+
+
+def load_open_instance(path: Path) -> OpenInstance:
+    """Load an open (no proven optimum) instance JSON, verifying its digest."""
+    record = _verified_record(path)
+    if "optimo" in record:
+        raise ValueError(f"{path.name}: carries a frozen optimum — use load_instance")
+    return OpenInstance(
+        name=f"{record['instancia']}-{record['convencion']}",
+        convention=record["convencion"],
+        n_nodes=int(record["n_nodos"]),
+        edges=tuple((int(i), int(j), int(w)) for i, j, w in record["aristas"]),
+        digest=record["digest"],
     )
 
 
