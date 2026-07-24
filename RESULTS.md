@@ -1,6 +1,6 @@
 # Resultados (generado por reproduce.py — no editar a mano)
 
-Entorno: Python 3.12.3, cvxpy 1.9.2, networkx 3.6.1, numpy 2.5.1, qiskit 2.5.1, qiskit-aer 0.17.2, scipy 1.18.0
+Entorno: Python 3.12.3, qiskit 2.5.1, qiskit-aer 0.17.2, cvxpy 1.9.2, networkx 3.6.1, numpy 2.5.1, scipy 1.18.0
 
 ## Líneas base clásicas
 
@@ -23,6 +23,12 @@ Entorno: Python 3.12.3, cvxpy 1.9.2, networkx 3.6.1, numpy 2.5.1, qiskit 2.5.1, 
 | cr12-uniforme | 1 | 0.7920 ± 0.0000 | 1.0000 |
 | cr12-uniforme | 2 | 0.8611 ± 0.0000 | 1.0000 |
 | cr12-uniforme | 3 | 0.8773 ± 0.0115 | 1.0000 |
+| cr16-uniforme | 1 | 0.7743 ± 0.0000 | 1.0000 |
+| cr16-uniforme | 2 | 0.8102 ± 0.0315 | 1.0000 |
+| cr16-uniforme | 3 | 0.8451 ± 0.0087 | 1.0000 |
+| cr20-uniforme | 1 | 0.7763 ± 0.0000 | 1.0000 |
+| cr20-uniforme | 2 | 0.8167 ± 0.0355 | 1.0000 |
+| cr20-uniforme | 3 | 0.8361 ± 0.0474 | 1.0000 |
 | cr6-uniforme | 1 | 0.8286 ± 0.0000 | 1.0000 |
 | cr6-uniforme | 2 | 0.8849 ± 0.0084 | 1.0000 |
 | cr6-uniforme | 3 | 0.9305 ± 0.0024 | 1.0000 |
