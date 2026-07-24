@@ -6,6 +6,9 @@ Entorno: Python 3.12.3, cvxpy 1.9.2, networkx 3.6.1, numpy 2.5.1, qiskit 2.5.1, 
 
 | instancia | óptimo | GW (mejor) | cota SDP | greedy | SA (mejor) |
 |---|---|---|---|---|---|
+| cr12-uniforme | 14 | 14 | 14.3 | 13 | 14 |
+| cr16-uniforme | 22 | 22 | 22.5 | 20 | 22 |
+| cr20-uniforme | 26 | 26 | 26.8 | 24 | 26 |
 | cr6-uniforme | 5 | 5 | 5.2 | 5 | 5 |
 | cr8-uniforme | 7 | 7 | 7.5 | 7 | 7 |
 | cr8-voltaje | 1150 | 1150 | 1242.0 | 1150 | 1150 |
@@ -17,6 +20,9 @@ Entorno: Python 3.12.3, cvxpy 1.9.2, networkx 3.6.1, numpy 2.5.1, qiskit 2.5.1, 
 
 | instancia | p | r = ⟨cut⟩/óptimo (media ± σ) | r mejor muestra |
 |---|---|---|---|
+| cr12-uniforme | 1 | 0.7920 ± 0.0000 | 1.0000 |
+| cr12-uniforme | 2 | 0.8611 ± 0.0000 | 1.0000 |
+| cr12-uniforme | 3 | 0.8773 ± 0.0115 | 1.0000 |
 | cr6-uniforme | 1 | 0.8286 ± 0.0000 | 1.0000 |
 | cr6-uniforme | 2 | 0.8849 ± 0.0084 | 1.0000 |
 | cr6-uniforme | 3 | 0.9305 ± 0.0024 | 1.0000 |
@@ -32,6 +38,18 @@ Entorno: Python 3.12.3, cvxpy 1.9.2, networkx 3.6.1, numpy 2.5.1, qiskit 2.5.1, 
 | ieee9-uniforme | 1 | 0.7312 ± 0.0000 | 1.0000 |
 | ieee9-uniforme | 2 | 0.8170 ± 0.0000 | 1.0000 |
 | ieee9-uniforme | 3 | 0.8488 ± 0.0189 | 1.0000 |
+
+## Escalera nacional ICE (clásico, sin óptimo probado)
+
+El óptimo verdadero está en el intervalo [mejor hallado, cota SDP]; r ≥ es la cota inferior de la razón de aproximación lograda.
+
+| instancia | n | aristas | mejor hallado (método) | cota SDP | r ≥ |
+|---|---|---|---|---|---|
+| cr26-uniforme | 26 | 37 | 34 (gw) | 35.1 | 0.9695 |
+| cr34-uniforme | 34 | 48 | 44 (gw) | 45.3 | 0.9716 |
+| cr44-uniforme | 44 | 60 | 55 (gw) | 57.7 | 0.9538 |
+| cr56-uniforme | 56 | 75 | 69 (gw) | 71.7 | 0.9617 |
+| cr68-uniforme | 68 | 90 | 83 (sa) | 86.4 | 0.9603 |
 
 ## Emuladores Quantinuum (vía Nexus, ángulos optimizados localmente)
 

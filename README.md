@@ -20,6 +20,13 @@ optimization, 26 for the H2 emulator) instances are **classical-only** and
 reported with the honest interval **[best cut found, SDP upper bound]** — no
 faked optima (`data/nacional/`, `scripts/build_cr_ladder.py`).
 
+## Dashboard
+
+A single-file, no-build visual summary — the partitioned cr8 corridor, the
+full national grid map, r vs p, classical baselines and the honest
+limitations — lives at `docs/index.html`. Open it directly or serve
+`docs/` with GitHub Pages.
+
 ## Reproduce everything
 
 ```bash

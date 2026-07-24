@@ -290,7 +290,7 @@ def write_results_md(classical: dict, sweeps: dict, open_reports: dict,
     lines += ["", "Limitación honesta: QAOA no supera a Goemans-Williamson en Max-Cut "
               "en ninguna instancia; la garantía p=1 (0.6924) es estrictamente menor "
               "que la de GW (0.878). Ver el informe para la discusión completa.", ""]
-    (ROOT / "RESULTS.md").write_text("\n".join(lines))
+    (ROOT / "RESULTS.md").write_text("\n".join(lines), encoding="utf-8")
 
 
 if __name__ == "__main__":

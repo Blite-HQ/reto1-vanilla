@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reto 1 — Max-Cut / QAOA · Blite</title>
+<style>
+  /* Tokens Blite (heredados del design system de Chimera Studio, DESIGN.md v3) */
+  :root {
+    color-scheme: light;
+    --radius: 0.45rem;
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --card: oklch(1 0 0);
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.45 0 0);
+    --border: oklch(0.922 0 0);
+    --brand: oklch(0.6 0.118 184.704);
+    --status-success: oklch(0.596 0.145 163.225);
+    --status-warning: oklch(0.666 0.179 58.318);
+    --chart-1: oklch(0.6 0.118 184.704);
+    --chart-2: oklch(0.541 0.281 293.009);
+    --chart-3: oklch(0.588 0.158 241.966);
+    --chart-4: oklch(0.666 0.179 58.318);
+    --chart-5: oklch(0.439 0 0);
+    --island-a: var(--chart-1);
+    --island-b: var(--chart-2);
+  }
+  [data-theme='dark'] {
+    color-scheme: dark;
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.205 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --border: oklch(1 0 0 / 10%);
+    --brand: oklch(0.777 0.152 181.912);
+    --status-success: oklch(0.765 0.177 163.223);
+    --status-warning: oklch(0.828 0.189 84.429);
+    --chart-1: oklch(0.777 0.152 181.912);
+    --chart-2: oklch(0.702 0.183 293.541);
+    --chart-3: oklch(0.746 0.16 232.661);
+    --chart-4: oklch(0.828 0.189 84.429);
+    --chart-5: oklch(0.708 0 0);
+  }
+  * { margin: 0; box-sizing: border-box; }
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .display { font-family: 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif; font-weight: 500; letter-spacing: -0.02em; }
+  code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+  header.top {
+    position: sticky; top: 0; z-index: 10;
+    background: color-mix(in oklab, var(--background) 88%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar { display: flex; align-items: center; justify-content: space-between; height: 56px; }
+  .brandmark { display: flex; align-items: center; gap: 10px; font-size: 15px; }
+  .brandmark .dot { width: 9px; height: 9px; border-radius: 2px; background: var(--brand); }
+  .brandmark .sep { color: var(--muted-foreground); font-weight: 400; }
+  .theme-btn {
+    border: 1px solid var(--border); background: transparent; color: var(--foreground);
+    border-radius: var(--radius); padding: 5px 12px; font: inherit; font-size: 13px; cursor: pointer;
+  }
+  .theme-btn:hover { background: var(--muted); }
+
+  .hero { padding: 44px 0 8px; }
+  .hero h1 { font-size: clamp(26px, 4vw, 38px); line-height: 1.15; }
+  .hero p.sub { margin-top: 10px; max-width: 62ch; color: var(--muted-foreground); font-size: 15px; }
+  .hero .accent { color: var(--brand); }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin: 28px 0 8px; }
+  .stat {
+    border: 1px solid var(--border); background: var(--card); border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+  .stat .k { font-size: 12px; color: var(--muted-foreground); text-transform: uppercase; letter-spacing: 0.06em; }
+  .stat .v { font-size: 24px; margin-top: 4px; }
+  .stat .v small { font-size: 13px; color: var(--muted-foreground); }
+
+  section { padding: 30px 0 6px; }
+  h2.sec { font-size: 20px; margin-bottom: 4px; }
+  p.secdesc { color: var(--muted-foreground); font-size: 14px; margin-bottom: 16px; max-width: 75ch; }
+
+  .card {
+    border: 1px solid var(--border); background: var(--card); border-radius: var(--radius);
+    padding: 18px; overflow-x: auto;
+  }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 860px) { .grid2 { grid-template-columns: 1fr; } }
+
+  svg text { font-family: inherit; }
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; font-size: 13px; color: var(--muted-foreground); }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .sw { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+  .sw-line { width: 18px; height: 0; border-top: 2.5px dashed var(--brand); display: inline-block; }
+
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  th, td { text-align: left; padding: 7px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  th { color: var(--muted-foreground); font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr:last-child td { border-bottom: none; }
+  .pill {
+    display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11.5px;
+    background: color-mix(in oklab, var(--status-success) 14%, transparent);
+    color: var(--status-success); border: 1px solid color-mix(in oklab, var(--status-success) 40%, transparent);
+  }
+
+  .callout {
+    border: 1px solid color-mix(in oklab, var(--status-warning) 40%, transparent);
+    background: color-mix(in oklab, var(--status-warning) 10%, transparent);
+    border-radius: var(--radius); padding: 16px 18px; font-size: 14px;
+  }
+  .callout strong { color: var(--status-warning); }
+  .callout ul { margin: 8px 0 0 18px; padding: 0; }
+  .callout li { margin-top: 5px; }
+
+  footer { margin-top: 44px; border-top: 1px solid var(--border); padding: 22px 0 40px; font-size: 13px; color: var(--muted-foreground); }
+  footer code { font-size: 12px; background: var(--muted); padding: 2px 7px; border-radius: 4px; }
+  a { color: var(--brand); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap topbar">
+    <div class="brandmark display"><span class="dot"></span><strong>blite</strong><span class="sep">/</span><span>reto 1 · quantathon CR 2026</span></div>
+    <button class="theme-btn" id="themeToggle" type="button">Claro</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="hero">
+    <h1 class="display">Zonas de aislamiento de fallas en la red eléctrica de Costa Rica, como <span class="accent">Max-Cut / QAOA</span></h1>
+    <p class="sub">Corredor real de 8 subestaciones del GAM (datos abiertos del Grupo ICE) particionado en dos
+    islas: modelado como Max-Cut, convertido a QUBO, resuelto con QAOA en emuladores <strong>Quantinuum H2</strong>
+    vía Nexus, y comparado honestamente contra las líneas base clásicas más fuertes. La misma malla de
+    corredores escala, con el mismo criterio determinista, hasta <strong>la red nacional completa —
+    68 subestaciones</strong>.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="k">Escalera nacional</div><div class="v">8 → 68 <small>· cr8 ⊂ … ⊂ cr68 (grid completo)</small></div></div>
+    <div class="stat"><div class="k">Óptimo probado (doble ancla)</div><div class="v">hasta n=20 <small>· cr8/12/16/20</small></div></div>
+    <div class="stat"><div class="k">Mejor r en emulador H2</div><div class="v">0.944 <small>· H2-1LE, cr8, p=3</small></div></div>
+    <div class="stat"><div class="k">Reproducibilidad</div><div class="v">66 tests <small>· SHA-256 + paridad Guppy</small></div></div>
+  </div>
+
+  <section>
+    <h2 class="sec display">La red real, particionada</h2>
+    <p class="secdesc">Corredor de transmisión del Gran Área Metropolitana. La partición óptima (corte = 7 de 9 líneas)
+    separa la red en dos zonas de aislamiento; las líneas discontinuas son el corte — los puntos donde se
+    seccionaría la red ante una falla.</p>
+    <div class="card">
+      <svg viewBox="0 0 760 430" role="img" aria-label="Grafo cr8: partición óptima en dos islas" style="width:100%;max-width:760px;display:block;margin:0 auto">
+        <!-- aristas de corte (7) -->
+        <g stroke="var(--brand)" stroke-width="2.5" stroke-dasharray="7 5" opacity="0.9">
+          <line x1="345" y1="215" x2="490" y2="295"/> <!-- La Caja - Alajuelita -->
+          <line x1="345" y1="215" x2="155" y2="275"/> <!-- La Caja - Ribera -->
+          <line x1="345" y1="215" x2="460" y2="95"/>  <!-- La Caja - Heredia -->
+          <line x1="490" y1="295" x2="625" y2="240"/> <!-- Alajuelita - Anonos -->
+          <line x1="490" y1="295" x2="635" y2="355"/> <!-- Alajuelita - Cóncavas -->
+          <line x1="165" y1="145" x2="155" y2="275"/> <!-- Belén - Ribera -->
+          <line x1="310" y1="85"  x2="460" y2="95"/>  <!-- Colima - Heredia -->
+        </g>
+        <!-- aristas internas (2) -->
+        <g stroke="var(--muted-foreground)" stroke-width="2" opacity="0.55">
+          <line x1="345" y1="215" x2="165" y2="145"/> <!-- La Caja - Belén -->
+          <line x1="345" y1="215" x2="310" y2="85"/>  <!-- La Caja - Colima -->
+        </g>
+        <!-- isla A (teal): La Caja, Anonos, Belén, Colima, Cóncavas -->
+        <g fill="var(--island-a)">
+          <circle cx="345" cy="215" r="15"/>
+          <circle cx="625" cy="240" r="12"/>
+          <circle cx="165" cy="145" r="12"/>
+          <circle cx="310" cy="85"  r="12"/>
+          <circle cx="635" cy="355" r="12"/>
+        </g>
+        <!-- isla B (violeta): Alajuelita, Ribera, Heredia -->
+        <g fill="var(--island-b)">
+          <circle cx="490" cy="295" r="12"/>
+          <circle cx="155" cy="275" r="12"/>
+          <circle cx="460" cy="95"  r="12"/>
+        </g>
+        <!-- etiquetas -->
+        <g fill="var(--foreground)" font-size="14">
+          <text x="345" y="248" text-anchor="middle" font-weight="600">La Caja</text>
+          <text x="490" y="328" text-anchor="middle">Alajuelita</text>
+          <text x="625" y="222" text-anchor="middle">Anonos</text>
+          <text x="165" y="127" text-anchor="middle">Belén</text>
+          <text x="155" y="308" text-anchor="middle">Ribera</text>
+          <text x="310" y="67"  text-anchor="middle">Colima</text>
+          <text x="460" y="128" text-anchor="middle">Heredia</text>
+          <text x="635" y="388" text-anchor="middle">Cóncavas</text>
+        </g>
+      </svg>
+      <div class="legend">
+        <span><span class="sw" style="background:var(--island-a)"></span>Zona A</span>
+        <span><span class="sw" style="background:var(--island-b)"></span>Zona B</span>
+        <span><span class="sw-line"></span>Corte óptimo (7 líneas)</span>
+        <span class="mono">digest 66bb6c5a…f91392</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec display">QAOA: calidad de la solución vs profundidad</h2>
+    <p class="secdesc">Razón de aproximación r = ⟨corte⟩/óptimo en cr8-uniforme. Los ángulos se optimizan
+    localmente (statevector exacto); el emulador muestrea con esos ángulos — el split híbrido estándar a escala NISQ.
+    En las tres fuentes la mejor muestra alcanza el óptimo (r = 1.0).</p>
+    <div class="card">
+      <svg viewBox="0 0 760 320" role="img" aria-label="r vs p: statevector local, H2-1LE y H2-Emulator" style="width:100%;max-width:760px;display:block;margin:0 auto">
+        <g stroke="var(--border)" stroke-width="1">
+          <line x1="90" y1="280" x2="720" y2="280"/>
+          <line x1="90" y1="217.5" x2="720" y2="217.5"/>
+          <line x1="90" y1="155" x2="720" y2="155"/>
+          <line x1="90" y1="92.5" x2="720" y2="92.5"/>
+        </g>
+        <line x1="90" y1="30" x2="720" y2="30" stroke="var(--status-success)" stroke-width="1.5" stroke-dasharray="5 5"/>
+        <text x="718" y="22" text-anchor="end" font-size="12" fill="var(--status-success)">óptimo (GW también r = 1.0)</text>
+        <g fill="var(--muted-foreground)" font-size="12">
+          <text x="80" y="284" text-anchor="end">0.500</text>
+          <text x="80" y="221" text-anchor="end">0.625</text>
+          <text x="80" y="159" text-anchor="end">0.750</text>
+          <text x="80" y="96"  text-anchor="end">0.875</text>
+          <text x="80" y="34"  text-anchor="end">1.000</text>
+        </g>
+        <g>
+          <rect x="108" y="99.6"  width="52" height="180.4" fill="var(--chart-1)" rx="3"/>
+          <rect x="166" y="102.2" width="52" height="177.8" fill="var(--chart-3)" rx="3"/>
+          <rect x="224" y="102.2" width="52" height="177.8" fill="var(--chart-4)" rx="3"/>
+          <rect x="318" y="78"   width="52" height="202"   fill="var(--chart-1)" rx="3"/>
+          <rect x="376" y="75.6" width="52" height="204.4" fill="var(--chart-3)" rx="3"/>
+          <rect x="434" y="78.95" width="52" height="201.05" fill="var(--chart-4)" rx="3"/>
+          <rect x="528" y="64.65" width="52" height="215.35" fill="var(--chart-1)" rx="3"/>
+          <rect x="586" y="57.95" width="52" height="222.05" fill="var(--chart-3)" rx="3"/>
+          <rect x="644" y="62.8"  width="52" height="217.2"  fill="var(--chart-4)" rx="3"/>
+        </g>
+        <g fill="var(--foreground)" font-size="11.5" text-anchor="middle" font-family="ui-monospace, Consolas, monospace">
+          <text x="134" y="93">0.861</text><text x="192" y="96">0.856</text><text x="250" y="96">0.856</text>
+          <text x="344" y="71">0.904</text><text x="402" y="69">0.909</text><text x="460" y="72">0.902</text>
+          <text x="554" y="58">0.931</text><text x="612" y="51">0.944</text><text x="670" y="56">0.934</text>
+        </g>
+        <g fill="var(--muted-foreground)" font-size="13" text-anchor="middle">
+          <text x="192" y="302">p = 1</text>
+          <text x="402" y="302">p = 2</text>
+          <text x="612" y="302">p = 3</text>
+        </g>
+      </svg>
+      <div class="legend">
+        <span><span class="sw" style="background:var(--chart-1)"></span>Statevector local (exacto + Aer)</span>
+        <span><span class="sw" style="background:var(--chart-3)"></span>H2-1LE (sin ruido, 1024 shots)</span>
+        <span><span class="sw" style="background:var(--chart-4)"></span>H2-Emulator (modelo de ruido H2, 1024 shots)</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec display">Contra las líneas base clásicas</h2>
+    <p class="secdesc">Cada instancia trae su óptimo congelado y probado con dos anclas independientes.
+    Goemans-Williamson (SDP, garantía ≥ 0.878) encuentra el óptimo exacto en todas.</p>
+    <div class="grid2">
+      <div class="card">
+        <table>
+          <thead><tr><th>Instancia</th><th class="num">Óptimo</th><th class="num">GW</th><th class="num">Cota SDP</th><th class="num">Greedy</th><th class="num">SA</th></tr></thead>
+          <tbody>
+            <tr><td>cr6-uniforme</td><td class="num">5</td><td class="num">5</td><td class="num">5.2</td><td class="num">5</td><td class="num">5</td></tr>
+            <tr><td><strong>cr8-uniforme</strong></td><td class="num">7</td><td class="num">7</td><td class="num">7.5</td><td class="num">7</td><td class="num">7</td></tr>
+            <tr><td>cr8-voltaje</td><td class="num">1150</td><td class="num">1150</td><td class="num">1242.0</td><td class="num">1150</td><td class="num">1150</td></tr>
+            <tr><td>ieee9-uniforme</td><td class="num">9</td><td class="num">9</td><td class="num">9.0</td><td class="num">9</td><td class="num">9</td></tr>
+            <tr><td>ieee14-flujo</td><td class="num">57070</td><td class="num">57070</td><td class="num">57766.9</td><td class="num">56814</td><td class="num">57070</td></tr>
+            <tr><td>ieee30-flujo</td><td class="num">32170</td><td class="num">32170</td><td class="num">33076.8</td><td class="num">30197</td><td class="num">31862</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <table>
+          <thead><tr><th>Emulador · instancia</th><th class="num">p</th><th class="num">r media</th><th class="num">mejor muestra</th></tr></thead>
+          <tbody>
+            <tr><td>H2-1LE · cr8-uniforme</td><td class="num">1</td><td class="num">0.8556</td><td class="num"><span class="pill">óptimo</span></td></tr>
+            <tr><td>H2-1LE · cr8-uniforme</td><td class="num">2</td><td class="num">0.9088</td><td class="num"><span class="pill">óptimo</span></td></tr>
+            <tr><td>H2-1LE · cr8-uniforme</td><td class="num">3</td><td class="num">0.9441</td><td class="num"><span class="pill">óptimo</span></td></tr>
+            <tr><td>H2-Emulator · cr8-uniforme</td><td class="num">3</td><td class="num">0.9344</td><td class="num"><span class="pill">óptimo</span></td></tr>
+            <tr><td>H2-1LE · cr8-voltaje</td><td class="num">3</td><td class="num">0.9154</td><td class="num"><span class="pill">óptimo</span></td></tr>
+            <tr><td>H2-1LE · ieee14-flujo</td><td class="num">3</td><td class="num">0.8548</td><td class="num"><span class="pill">óptimo</span></td></tr>
+            <tr><td>H2-1LE · ieee9-uniforme</td><td class="num">3</td><td class="num">0.8506</td><td class="num"><span class="pill">óptimo</span></td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:10px;font-size:12.5px;color:var(--muted-foreground)">Corrida completa (19 combinaciones) en <code>runs/nexus/</code>; cada corte se recomputa clásicamente desde los bitstrings muestreados — verificación agnóstica del backend.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec display">Escalando de 8 a 68 subestaciones: la red nacional completa</h2>
+    <p class="secdesc">El mismo criterio determinista de crecimiento de corredor (greedy, más denso desde la
+    subestación de mayor grado) genera una familia anidada cr8 ⊂ cr12 ⊂ … ⊂ <strong>cr68 — el grafo de
+    transmisión nacional completo</strong>. Hasta 20 nodos el óptimo está probado con doble ancla (fuerza
+    bruta + espectro); más allá, sin fingir un óptimo que no se puede probar, reportamos el intervalo honesto
+    <strong>[mejor corte clásico hallado, cota SDP]</strong>.</p>
+    <div class="grid2">
+      <div class="card" style="padding:12px">
+        <img src="assets/mapa-nacional.png" alt="Mapa de la red nacional de transmisión (68 subestaciones) con partición en zonas de falla, corredor cr8 resaltado" style="width:100%;border-radius:6px;display:block">
+      </div>
+      <div class="card" style="padding:12px">
+        <img src="assets/escalado-nacional.png" alt="Razón de aproximación r vs tamaño de instancia, con los muros cuánticos de 20 y 26 qubits marcados" style="width:100%;border-radius:6px;display:block">
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <table>
+        <thead><tr>
+          <th class="num">n</th><th>Estado</th><th class="num">Óptimo / mejor hallado</th>
+          <th class="num">GW</th><th class="num">SA</th><th class="num">Greedy</th>
+          <th class="num">Cota SDP</th><th class="num">r garantizado</th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="num">8</td><td><span class="pill">probado</span></td><td class="num">7</td><td class="num">7</td><td class="num">7</td><td class="num">7</td><td class="num">7.50</td><td class="num">1.0000</td></tr>
+          <tr><td class="num">12</td><td><span class="pill">probado</span></td><td class="num">14</td><td class="num">14</td><td class="num">14</td><td class="num">13</td><td class="num">14.32</td><td class="num">1.0000</td></tr>
+          <tr><td class="num">16</td><td><span class="pill">probado</span></td><td class="num">22</td><td class="num">22</td><td class="num">22</td><td class="num">20</td><td class="num">22.54</td><td class="num">1.0000</td></tr>
+          <tr><td class="num">20</td><td><span class="pill">probado</span></td><td class="num">26</td><td class="num">26</td><td class="num">26</td><td class="num">24</td><td class="num">26.79</td><td class="num">1.0000</td></tr>
+          <tr><td class="num">26</td><td>intervalo</td><td class="num">34</td><td class="num">34</td><td class="num">34</td><td class="num">30</td><td class="num">35.07</td><td class="num">0.9695</td></tr>
+          <tr><td class="num">34</td><td>intervalo</td><td class="num">44</td><td class="num">44</td><td class="num">44</td><td class="num">37</td><td class="num">45.29</td><td class="num">0.9716</td></tr>
+          <tr><td class="num">44</td><td>intervalo</td><td class="num">55</td><td class="num">55</td><td class="num">55</td><td class="num">49</td><td class="num">57.67</td><td class="num">0.9538</td></tr>
+          <tr><td class="num">56</td><td>intervalo</td><td class="num">69</td><td class="num">69</td><td class="num">68</td><td class="num">65</td><td class="num">71.75</td><td class="num">0.9617</td></tr>
+          <tr><td class="num">68 <span class="mono" style="font-size:11px">(nacional)</span></td><td>intervalo</td><td class="num">83</td><td class="num">82</td><td class="num"><strong>83</strong></td><td class="num">81</td><td class="num">86.43</td><td class="num">0.9603</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:12px;font-size:13px;color:var(--muted-foreground)">
+        <strong style="color:var(--foreground)">Hallazgo honesto:</strong> a n=68 el recocido simulado (SA)
+        supera a Goemans-Williamson por primera vez en toda la escalera (83 vs 82) — ninguna heurística clásica
+        domina universalmente a esta escala, que es exactamente por qué reportamos un intervalo y no un número
+        inventado.
+      </p>
+      <p style="margin-top:8px;font-size:13px;color:var(--muted-foreground)">
+        <strong style="color:var(--foreground)">El muro cuántico:</strong> QAOA con barrido completo (p=1..3,
+        5 semillas) corrió hasta cr12 (r = 0.792 → 0.877 al aumentar p); cr16/cr20 tienen óptimo clásico
+        probado pero el barrido cuántico local aún no se ejecutó a esa profundidad — documentado, no
+        escondido. Más allá de 20 qubits (optimización local) y 26 (techo del emulador H2), no hay pata
+        cuántica posible con el hardware disponible hoy.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec display">Entregables del reto</h2>
+    <p class="secdesc">Además del código y los datos, el reto pide un paquete de entrega formal — generado
+    desde el mismo <code>reproduce.py</code>, nunca escrito a mano.</p>
+    <div class="grid2">
+      <div class="card" style="padding:16px 18px">
+        <strong>Informe técnico (Typst → PDF)</strong>
+        <p style="margin-top:6px;font-size:13.5px;color:var(--muted-foreground)">Planteamiento, QUBO exacta, QAOA, líneas base, escalera nacional y limitaciones — compilado con <code>scripts/build_informe.py</code>.</p>
+        <p style="margin-top:8px"><a href="https://github.com/Blite-HQ/reto1-vanilla/blob/main/informe/informe.pdf">informe/informe.pdf →</a></p>
+      </div>
+      <div class="card" style="padding:16px 18px">
+        <strong>Slides (5 minutos)</strong>
+        <p style="margin-top:6px;font-size:13.5px;color:var(--muted-foreground)">Gancho, método, resultados, escalado nacional y limitaciones — un slide por bloque de la presentación oficial.</p>
+        <p style="margin-top:8px"><a href="https://github.com/Blite-HQ/reto1-vanilla/blob/main/informe/slides.pdf">informe/slides.pdf →</a></p>
+      </div>
+      <div class="card" style="padding:16px 18px">
+        <strong>Notebook narrativo (ejecutado)</strong>
+        <p style="margin-top:6px;font-size:13.5px;color:var(--muted-foreground)">El recorrido de punta a punta — datos → QUBO → QAOA → verificación — en celdas ejecutadas, para revisar sin instalar nada.</p>
+        <p style="margin-top:8px"><a href="https://github.com/Blite-HQ/reto1-vanilla/blob/main/notebooks/reto1.ipynb">notebooks/reto1.ipynb →</a></p>
+      </div>
+      <div class="card" style="padding:16px 18px">
+        <strong>Statement de SDK + port Guppy/Selene</strong>
+        <p style="margin-top:6px;font-size:13.5px;color:var(--muted-foreground)">Qiskit + pytket/qnexus en producción, port de paridad a Guppy (SDK recomendado) verificado dentro de 1σ estadística contra el statevector exacto.</p>
+        <p style="margin-top:8px"><a href="https://github.com/Blite-HQ/reto1-vanilla/blob/main/STATEMENT-SDK.md">STATEMENT-SDK.md →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec display">Limitaciones honestas</h2>
+    <div class="callout">
+      <strong>QAOA no supera a Goemans-Williamson en Max-Cut hoy — y lo decimos de frente.</strong>
+      <ul>
+        <li>La garantía de QAOA a p=1 (0.6924) es estrictamente menor que la de GW (0.878); en nuestras instancias GW además <em>encuentra el óptimo exacto</em>.</li>
+        <li>A estos tamaños (6–30 nodos) los solvers clásicos exactos responden en milisegundos: el valor del ejercicio es el flujo híbrido verificado, no un speedup cuántico.</li>
+        <li>La optimización de ángulos corre en statevector local; el emulador muestrea y analiza ruido (split híbrido documentado, práctica estándar NISQ).</li>
+        <li>Los pesos «voltaje» de cr8 son un proxy documentado; el aislamiento físico real (balance generación/carga, N-1) no se codifica en Max-Cut plano — mapea a la extensión oficial de «constraint mixers».</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap" style="padding:0">
+      <p>Reproducible de punta a punta: <code>python reproduce.py</code> · corridas de emulador vía <code>qnexus</code> con caché offline · instancias congeladas con digests SHA-256 y óptimos probados con doble ancla.</p>
+      <p style="margin-top:8px">Fuente de datos: <a href="https://datos-ice-se.opendata.arcgis.com" rel="noopener">datos abiertos Grupo ICE</a> (líneas de transmisión y subestaciones) · Quantathon CR 2026 · MIT.</p>
+    </div>
+  </footer>
+
+</main>
+
+<script>
+  var btn = document.getElementById('themeToggle');
+  var root = document.documentElement;
+  btn.addEventListener('click', function () {
+    var dark = root.getAttribute('data-theme') === 'dark';
+    root.setAttribute('data-theme', dark ? 'light' : 'dark');
+    btn.textContent = dark ? 'Oscuro' : 'Claro';
+  });
+</script>
+</body>
+</html>

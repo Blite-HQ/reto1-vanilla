@@ -153,7 +153,7 @@ def figure_noise_comparison(records: list[dict], local_sweeps: dict[str, dict],
 
 def _substation_coordinates(raw_path: Path) -> dict[str, tuple[float, float]]:
     """Display name -> (lon, lat) from the raw ICE substations GeoJSON."""
-    features = json.loads(raw_path.read_text())["features"]
+    features = json.loads(raw_path.read_text(encoding="utf-8"))["features"]
     return {f["properties"]["Subestacio"]: tuple(f["geometry"]["coordinates"])
             for f in features}
 
